@@ -3,9 +3,9 @@
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
-    "type": "module",
+    "type": "commonjs",
     "scripts": {
-        "run": "tsc -t ES2020 src/index.ts src/helpers.ts && node src/index.js",
+        "run": "tsc src/index.ts src/helpers.ts --outDir out && node out/index.js",
         "⬇️ install-npm-packages": "npm install",
         "___Global install NCU to run the commands below": "https://www.npmjs.com/package/npm-check-updates",
         "🔍check-npm-packages": "ncu",
@@ -15,8 +15,13 @@
         "type": "git"
     },
     "devDependencies": {
-        "eslint": "^8.38.0",
-        "prettier": "2.8.7",
-        "typescript": "^5.0.4"
+        "@types/node": "^22.7.4",
+        "eslint": "^9.11.1",
+        "prettier": "3.3.3",
+        "typescript": "^5.6.2"
+    },
+    "dependencies": {
+        "chroma-console": "^1.0.34"
     }
 }
+
