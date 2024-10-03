@@ -17,7 +17,7 @@ const emptyCity: FinalDataPointType = {
     cityName: '',
     dataPointCount: 0,
     tempature: 0,
-    min_tempature: 0,
+    min_tempature: 100,
     max_tempature: 0,
     average_tempature: 0,
 };
@@ -38,14 +38,13 @@ const billionRows: DataPoint[] = [
 billionRows.sort(); // alphabet
 
 // let finalObject : FinalDataPointType = [{}]
-let tempArray = [];
 
 const checkElement = (accumulator: FinalDataPointType, element: DataPoint) => {
-    if (element.tempature < tempArray[0].min_tempature) {
+    if (element.tempature < accumulator.min_tempature) {
         accumulator.min_tempature = element.tempature;
     }
 
-    if (element.tempature > tempArray[0].max_tempature) {
+    if (element.tempature > accumulator.max_tempature) {
         accumulator.max_tempature = element.tempature;
     }
 
@@ -70,16 +69,23 @@ function main(): void {
                 cityName: billionRows[i].cityName,
                 ...emptyCity,
             });
+            currentCity = billionRows[i].cityName;
         }
 
         const allCityDataPoints = billionRows.filter(
             (x) => x.cityName === currentCity
         );
 
+        const allCityDataPointsFINAL: FinalDataPointType[] =
+            allCityDataPoints.map((x) => {
+                return { x, ...emptyCity };
+            });
+
+        // turn this array into a final data type array
+
         const accumulator: FinalDataPointType = emptyCity;
-        const returnElement = allCityDataPoints.reduce(
-            checkElement(accumulator, x),
-            accumulator
+        const returnElement = allCityDataPointsFINAL.reduce((accumulator2, x) =>
+            checkElement(accumulator, x)
         );
 
         Coco.log(returnElement);
