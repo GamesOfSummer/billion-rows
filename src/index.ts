@@ -1,9 +1,6 @@
 import { validateFxn } from './helpers.js';
 import { Coco } from 'chroma-console';
 
-Coco.setColor('firewood');
-Coco.start();
-
 interface FinalDataPointType {
     cityName: string;
     dataPointCount: number;
@@ -40,6 +37,8 @@ billionRows.sort(); // alphabet
 // let finalObject : FinalDataPointType = [{}]
 
 const checkElement = (accumulator: FinalDataPointType, element: DataPoint) => {
+    accumulator.cityName = element.cityName;
+
     if (element.tempature < accumulator.min_tempature) {
         accumulator.min_tempature = element.tempature;
     }
@@ -70,29 +69,31 @@ function main(): void {
                 ...emptyCity,
             });
             currentCity = billionRows[i].cityName;
+
+            const allCityDataPoints = billionRows.filter(
+                (x) => x.cityName === currentCity
+            );
+
+            const allCityDataPointsFINAL: FinalDataPointType[] =
+                allCityDataPoints.map((x) => {
+                    return { ...emptyCity, ...x };
+                });
+
+            // turn this array into a final data type array
+
+            const accumulator: FinalDataPointType = emptyCity;
+            const returnElement = allCityDataPointsFINAL.reduce(
+                (accumulator, x) => checkElement(accumulator, x)
+            );
+
+            Coco.log(returnElement);
         }
-
-        const allCityDataPoints = billionRows.filter(
-            (x) => x.cityName === currentCity
-        );
-
-        const allCityDataPointsFINAL: FinalDataPointType[] =
-            allCityDataPoints.map((x) => {
-                return { x, ...emptyCity };
-            });
-
-        // turn this array into a final data type array
-
-        const accumulator: FinalDataPointType = emptyCity;
-        const returnElement = allCityDataPointsFINAL.reduce((accumulator2, x) =>
-            checkElement(accumulator, x)
-        );
-
-        Coco.log(returnElement);
-        //finalArray.push(returnElement);
     }
 }
 
+Coco.setColor('firewood');
+Coco.start();
 main();
+Coco.end();
 
 export {};
