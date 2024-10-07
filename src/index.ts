@@ -3,9 +3,8 @@ import { Coco } from 'chroma-console';
 
 interface FinalDataPointType {
     cityName: string;
-    dataPointCount: number;
     dataPointArray: number[];
-    tempature: number;
+    currentTempature: number;
     min_tempature: number;
     max_tempature: number;
     average_tempature: number;
@@ -13,9 +12,8 @@ interface FinalDataPointType {
 
 const emptyCity: FinalDataPointType = {
     cityName: '',
-    dataPointCount: 0,
     dataPointArray: [],
-    tempature: 0,
+    currentTempature: 0,
     min_tempature: 100,
     max_tempature: 0,
     average_tempature: 0,
@@ -23,62 +21,26 @@ const emptyCity: FinalDataPointType = {
 
 interface DataPoint {
     cityName: string;
-    tempature: number;
+    currentTempature: number;
 }
 
 const billionRows: DataPoint[] = [
-    { cityName: 'Amsterdam', tempature: 50.5 },
-    { cityName: 'Amsterdam', tempature: 51.5 },
-    { cityName: 'Amsterdam', tempature: 49.5 },
-    { cityName: 'Amsterdam', tempature: 42.0 },
-    { cityName: 'Amsterdam', tempature: 60.0 },
-    { cityName: 'Austria', tempature: 30.0 },
-    { cityName: 'Austria', tempature: 31.0 },
-    { cityName: 'Austria', tempature: 32.5 },
-    { cityName: 'Argentina', tempature: 44.5 },
+    { cityName: 'Austria', currentTempature: 30.0 },
+    { cityName: 'Austria', currentTempature: 31.0 },
+    { cityName: 'Austria', currentTempature: 32.5 },
+    { cityName: 'Amsterdam', currentTempature: 50.5 },
+    { cityName: 'Amsterdam', currentTempature: 51.5 },
+    { cityName: 'Amsterdam', currentTempature: 49.5 },
+    { cityName: 'Amsterdam', currentTempature: 42.0 },
+    { cityName: 'Amsterdam', currentTempature: 60.0 },
 ];
 
-//billionRows.sort(); // alphabet
-
-const checkElement = (accumulator: FinalDataPointType, element: DataPoint) => {
-    accumulator.cityName = element.cityName;
-    accumulator.dataPointCount++;
-    accumulator.dataPointArray.push(element.tempature);
-
-    let totalHolder = accumulator.dataPointArray.reduce((total, num) => {
-        return total + num;
-    });
-
-    accumulator.average_tempature =
-        totalHolder / accumulator.dataPointArray.length;
-
-    if (element.tempature < accumulator.min_tempature) {
-        accumulator.min_tempature = element.tempature;
-    }
-
-    if (element.tempature > accumulator.max_tempature) {
-        accumulator.max_tempature = element.tempature;
-    }
-
-    if (element.tempature > accumulator.max_tempature) {
-        accumulator.max_tempature = element.tempature;
-    }
-
-    return accumulator;
-};
-
 function main(): void {
-    let finalArray: FinalDataPointType[] = [];
-
     let currentCity = '';
     for (let i = 0; i < billionRows.length; i++) {
         let accumulator: FinalDataPointType = emptyCity;
 
         if (currentCity !== billionRows[i].cityName) {
-            finalArray.push({
-                cityName: billionRows[i].cityName,
-                ...emptyCity,
-            });
             currentCity = billionRows[i].cityName;
             accumulator = emptyCity;
             accumulator.dataPointArray = [];
@@ -87,17 +49,45 @@ function main(): void {
                 (x) => x.cityName === currentCity
             );
 
+            // turn this array into a final data type array
             const allCityDataPointsFINAL: FinalDataPointType[] =
                 allCityDataPoints.map((x) => {
                     return { ...emptyCity, ...x };
                 });
 
-            // turn this array into a final data type array
-            const returnElement = allCityDataPointsFINAL.reduce(
-                (accumulator, x) => checkElement(accumulator, x)
+            accumulator.cityName = currentCity;
+            for (let j = 0; i < allCityDataPointsFINAL.length - 1; j++) {
+                accumulator.dataPointArray.push(
+                    allCityDataPointsFINAL[j].currentTempature
+                );
+
+                if (
+                    allCityDataPointsFINAL[j].currentTempature <
+                    accumulator.min_tempature
+                ) {
+                    accumulator.min_tempature =
+                        allCityDataPointsFINAL[j].currentTempature;
+                }
+
+                if (
+                    allCityDataPointsFINAL[j].currentTempature >
+                    accumulator.max_tempature
+                ) {
+                    accumulator.max_tempature =
+                        allCityDataPointsFINAL[j].currentTempature;
+                }
+            }
+
+            let totalHolder = accumulator.dataPointArray.reduce(
+                (total, num) => {
+                    return total + num;
+                }
             );
 
-            Coco.log(returnElement);
+            accumulator.average_tempature =
+                totalHolder / accumulator.dataPointArray.length - 1;
+
+            Coco.log(accumulator);
         }
     }
 }
