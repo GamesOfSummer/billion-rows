@@ -4,6 +4,7 @@ import { Coco } from 'chroma-console';
 interface FinalDataPointType {
     cityName: string;
     dataPointCount: number;
+    dataPointArray: number[];
     tempature: number;
     min_tempature: number;
     max_tempature: number;
@@ -13,6 +14,7 @@ interface FinalDataPointType {
 const emptyCity: FinalDataPointType = {
     cityName: '',
     dataPointCount: 0,
+    dataPointArray: [],
     tempature: 0,
     min_tempature: 100,
     max_tempature: 0,
@@ -28,16 +30,27 @@ const billionRows: DataPoint[] = [
     { cityName: 'Amsterdam', tempature: 50.5 },
     { cityName: 'Amsterdam', tempature: 51.5 },
     { cityName: 'Amsterdam', tempature: 49.5 },
-    { cityName: 'Austria', tempature: 49.5 },
-    { cityName: 'Austria', tempature: 44.5 },
+    { cityName: 'Amsterdam', tempature: 42.0 },
+    { cityName: 'Amsterdam', tempature: 60.0 },
+    { cityName: 'Austria', tempature: 30.0 },
+    { cityName: 'Austria', tempature: 31.0 },
+    { cityName: 'Austria', tempature: 32.5 },
+    { cityName: 'Argentina', tempature: 44.5 },
 ];
 
-billionRows.sort(); // alphabet
-
-// let finalObject : FinalDataPointType = [{}]
+//billionRows.sort(); // alphabet
 
 const checkElement = (accumulator: FinalDataPointType, element: DataPoint) => {
     accumulator.cityName = element.cityName;
+    accumulator.dataPointCount++;
+    accumulator.dataPointArray.push(element.tempature);
+
+    let totalHolder = accumulator.dataPointArray.reduce((total, num) => {
+        return total + num;
+    });
+
+    accumulator.average_tempature =
+        totalHolder / accumulator.dataPointArray.length;
 
     if (element.tempature < accumulator.min_tempature) {
         accumulator.min_tempature = element.tempature;
@@ -47,13 +60,9 @@ const checkElement = (accumulator: FinalDataPointType, element: DataPoint) => {
         accumulator.max_tempature = element.tempature;
     }
 
-    // let total = 0
-    // for(int i  = 0; i < tempArray.length; i++)
-    // {
-    // total =+ tempArray.tempature;
-    // }
-
-    // tempArray[0].average_tempature = total / 3;
+    if (element.tempature > accumulator.max_tempature) {
+        accumulator.max_tempature = element.tempature;
+    }
 
     return accumulator;
 };
@@ -63,12 +72,16 @@ function main(): void {
 
     let currentCity = '';
     for (let i = 0; i < billionRows.length; i++) {
+        let accumulator: FinalDataPointType = emptyCity;
+
         if (currentCity !== billionRows[i].cityName) {
             finalArray.push({
                 cityName: billionRows[i].cityName,
                 ...emptyCity,
             });
             currentCity = billionRows[i].cityName;
+            accumulator = emptyCity;
+            accumulator.dataPointArray = [];
 
             const allCityDataPoints = billionRows.filter(
                 (x) => x.cityName === currentCity
@@ -80,8 +93,6 @@ function main(): void {
                 });
 
             // turn this array into a final data type array
-
-            const accumulator: FinalDataPointType = emptyCity;
             const returnElement = allCityDataPointsFINAL.reduce(
                 (accumulator, x) => checkElement(accumulator, x)
             );
